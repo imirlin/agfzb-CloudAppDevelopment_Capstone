@@ -173,9 +173,7 @@ def analyze_review_sentiments(dealerreview):
         json_result = {'score': 0, 'label': 'unset'}
 
     label = json_result['label']
-
-    # match label:
-    # match json_result["label"]:
+    
     if label == "negative":
         json_result["color"] = "danger"
         json_result['fa'] = 'fa-frown-o'
