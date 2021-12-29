@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 
-# from .models import related models
+from .models import CarModel, CarMake
 from .restapis import (
     get_dealers_from_cf,
     get_dealer_by_state_or_id,
@@ -59,7 +59,6 @@ def logout_request(request):
 
 
 # Create a `registration_request` view to handle sign up request
-# def registration_request(request):
 def registration_request(request):
     context = {}
     if request.method == "GET":
@@ -87,24 +86,18 @@ def registration_request(request):
             context["message"] = "Registration was successful."
             context["is_success"] = True
             return render(request, "djangoapp/registration.html", context)
-            # return redirect("djangoapp:registration")
         else:
             context["message"] = "User already exists."
             return render(request, "djangoapp/registration.html", context)
 
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
-# def get_dealerships(request):
-#     context = {}
-#     if request.method == "GET":
-#         return render(request, "djangoapp/index.html", context)
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
         url = "https://b66bd5c1.us-south.apigw.appdomain.cloud/api/dealership"
-
-        # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
+
         # dealerships = get_dealer_by_state_or_id(url, state="CA", dealerId=None)
         # dealerships = get_dealer_by_state_or_id(url, state=None, dealerId=1)
 
@@ -132,26 +125,36 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
-def add_review(request):
+def add_review(request, dealer_id):
     context = {}
     review = dict()
     json_payload = dict()
 
     review["time"] = datetime.utcnow().isoformat()
-    # review["dealership"] = dealer_id
 
+    if request.method == "GET":
+        url = "https://b66bd5c1.us-south.apigw.appdomain.cloud/api/dealership"
+
+        dealerships = get_dealer_by_state_or_id(url, state=None, dealerId=dealer_id)
+        context["dealerships"] = dealerships[0]
+        context["dealer_id"] = dealer_id
+
+        cars = CarModel.objects.filter(dealer_id=dealer_id)
+        context["cars"] = cars
+
+        return render(request, "djangoapp/add_review.html", context)
 
     if request.method == "POST":
         print(request.POST)
+        car = CarModel.objects.get(id=int(request.POST["car"]))
         review["review"] = request.POST["review_text"]
         review["name"] = request.POST["name"]
         review["purchase"] = request.POST["purchase"]
         review["purchase_date"] = request.POST["purchase_date"]
-        review["car_make"] = request.POST["car_make"]
-        review["car_model"] = request.POST["car_model"]
-        review["car_year"] = request.POST["car_year"]
+        review["car_make"] = car.make.name 
+        review["car_model"] = car.name 
+        review["car_year"] = car.year.strftime("%Y") 
         review["dealership"] = int(request.POST["dealership"])
-        # review["id"] = request.POST["id"]
 
         id=request.POST["dealership"]
 
@@ -160,9 +163,6 @@ def add_review(request):
         url = "https://b66bd5c1.us-south.apigw.appdomain.cloud/api/review"
 
         reviews = post_request(url, json_payload=json_payload)
-        print(reviews)
+        
         context["reviews"] = reviews
-        # return reviews
-        # return HttpResponse(reviews)
-        # return render(request, "djangoapp/dealer_details.html", context)
         return redirect("/djangoapp/dealer/" + id)

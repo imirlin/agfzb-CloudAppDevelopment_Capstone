@@ -1,16 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <title>Add Review</title>
     {% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css"
+        rel="stylesheet">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 
 </head>
-    <body>
-    <!--Add review form here -->
-    </body>
+
+<body>
+
+    <!-- Add review -->
+    <div class="container mt-5">
+        {% if user.is_authenticated %}
+        <div class="row justify-content-center" id="collapseExample">
+            <div class="card card-body col-md-6">
+                <form class="form-inline0" action="{% url 'djangoapp:dealer_review' dealer_id %}" method="post">
+                    {% csrf_token %}
+
+                    <label class="h6" for="name">Your Name:</label>
+                    <input type="text" class="form-control mb-3" placeholder="Your name" name="name" id="name"
+                        value="{{user.first_name}}" />
+
+                    <label class="h6" for="review_text">Enter the review content:</label>
+                    <textarea class="form-control mb-3" placeholder="Your review" name="review_text"
+                        id="review_text"></textarea>
+
+                    <hr class="mb-3" />
+
+                    <label for="car" class="h6">Select your car (model-make-year):</label>
+                    <select name="car" id="car" class="form-select form-control mb-3" required>
+                        {% for car in cars %}
+                        <option selected value={{car.id}}>
+                            {{car.name}}-{{car.make.name}}-{{ car.year|date:"Y" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <div
+                        class="input-group-text0 d-flex justify-content-between align-items-center bg-transparent mb-3">
+                        <label class="h6">Has purchased the car from {{dealerships.full_name}}?</label>
+                        <input type="checkbox" aria-label="Checkbox for following text input" name="purchase">
+                        <span />
+                    </div>
+
+                    <label class="h6" for="purchasedate">Select Your Purchase Date:</label>
+                    <input type="date" class="form-control mb-3" placeholder="Purchase date" name="purchase_date"
+                        id="purchasedate" />
+
+                    <input type="hidden" name="dealership" value="{{dealer_id}}" />
+                    <button class="btn btn-success btn-block" type="submit">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+<script type="text/javascript">
+    $('.date-own').datepicker({
+        format: 'mm/dd/yyyy'
+    });
+</script>
+
 </html>

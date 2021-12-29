@@ -14,7 +14,7 @@ class CarMake(models.Model):
     description = models.CharField(max_length=1000)
 
     def __str__(self):
-        return self.name + " (" + self.description + ")"
+        return self.name
 
 
 # <HINT> Create a Car Model model `class CarModel(models.Model):`:
@@ -26,8 +26,9 @@ class CarMake(models.Model):
 # - Any other fields you would like to include in car model
 # - __str__ method to print a car make object
 class CarModel(models.Model):
-    car_makes = models.ManyToManyField(CarMake)
-    name = models.CharField(max_length=100, primary_key=True)
+    id = models.AutoField(primary_key=True)
+    make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     dealer_id = models.IntegerField()
     type = models.CharField(
         max_length=48, choices=[("Sedan", "Sedan"), ("SUV", "SUV"), ("WAGON", "WAGON")]
@@ -35,7 +36,7 @@ class CarModel(models.Model):
     year = models.DateField(null=True)
 
     def __str__(self):
-        return self.name + " (" + self.type + ")"
+        return self.name
 
 
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
@@ -85,4 +86,4 @@ class DealerReview:
         self.review_sentiment = review_sentiment
 
     def __str__(self):
-        return "Review: " + self.review #+ ", Review sentiment: " + self.review_sentiment
+        return "Review: " + self.review
