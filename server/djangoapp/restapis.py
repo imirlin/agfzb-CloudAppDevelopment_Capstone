@@ -172,19 +172,22 @@ def analyze_review_sentiments(dealerreview):
     else: 
         json_result = {'score': 0, 'label': 'unset'}
 
-    match json_result['label']:
-        case 'negative':
-            json_result['color'] = 'danger'
-            json_result['fa'] = 'fa-frown-o'
-        case 'neutral':
-            json_result['color'] = 'warning'
-            json_result['fa'] = 'fa-meh-o'
-        case 'positive':
-            json_result['color'] = 'success'
-            json_result['fa'] = 'fa-smile-o'
-        case 'unset':
-            json_result['color'] = ''
-            json_result['fa'] = ''
+    label = json_result['label']
+
+    # match label:
+    # match json_result["label"]:
+    if label == "negative":
+        json_result["color"] = "danger"
+        json_result['fa'] = 'fa-frown-o'
+    if label == 'neutral':
+        json_result['color'] = 'warning'
+        json_result['fa'] = 'fa-meh-o'
+    if label == 'positive':
+        json_result['color'] = 'success'
+        json_result['fa'] = 'fa-smile-o'
+    if label == 'unset':
+        json_result['color'] = ''
+        json_result['fa'] = ''
 
     print("\n-----------------------------")
     print(json_result)
